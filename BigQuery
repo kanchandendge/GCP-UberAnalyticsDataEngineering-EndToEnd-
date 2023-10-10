@@ -1,0 +1,44 @@
+select VendorID, Avg(fare_amount) from hardy-being-401519.UberAnalytics.fact_uber
+group by VendorID;
+
+select b.payment_type_name, avg(a.tip_amount) from 
+hardy-being-401519.UberAnalytics.fact_uber a
+join hardy-being-401519.UberAnalytics.dim_payment_type b
+on a.payment_type_id = b.payment_type_id
+group by b.payment_type_name;
+
+#----------------------Aggregate Table Creation----------------------------------------------------------
+create or replace table hardy-being-401519.UberAnalytics.agg_uber_analytics AS(
+select  
+f.VendorID,
+d.tpep_dropoff_datetime,
+r.rate_code_name,
+pu.pickup_longitude,
+pu.pickup_latitude,
+dp.dropoff_longitude,
+dp.dropoff_latitude,
+pt.payment_type_name,
+f.tip_amount,
+f.mta_tax,
+f.tolls_amount,
+f.total_amount,
+f.fare_amount
+ from hardy-being-401519.UberAnalytics.fact_uber f
+ join hardy-being-401519.UberAnalytics.dim_datetime d
+ on f.datetime_id = d.datetime_id
+ join hardy-being-401519.UberAnalytics.dim_passenger_count p
+ on f.passenger_count_id = p.passenger_count_id
+ join hardy-being-401519.UberAnalytics.dim_trip_distance t
+ on f.trip_distance_id = t.trip_distance_id
+ join hardy-being-401519.UberAnalytics.dim_rate_code r
+ on f.rate_code_id = r.rate_code_id
+ join hardy-being-401519.UberAnalytics.dim_pickup_location pu
+ on f.pickup_location_id = pu.pickup_location_id
+ join hardy-being-401519.UberAnalytics.dim_dropoff_location dp
+ on f.dropoff_location_id = dp.dropoff_location_id
+ join hardy-being-401519.UberAnalytics.dim_payment_type pt
+ on f. payment_type_id = pt.payment_type_id);
+
+
+
+
